@@ -20,13 +20,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # ✅ Required Node version
-      - name: Setup Node.js 20.x
+      # Node 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
+          cache: 'npm'
 
-      # ✅ Required env variables for tests
+      # Create env file
       - name: Create .env file
         run: |
           echo "USERNAME=${{ secrets.USERNAME }}" >> .env
@@ -39,22 +40,13 @@ jobs:
           echo "COUNTRY=${{ secrets.COUNTRY }}" >> .env
           echo "ZIP_CODE=${{ secrets.ZIP_CODE }}" >> .env
 
-      # ✅ Cache npm dependencies
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      # ✅ Install dependencies + TestDino (.tgz) + Playwright browsers
-      - name: Install dependencies & browsers
+      # Install deps & browsers
+      - name: Install dependencies
         run: |
           npm ci
-          npx playwright install --with-deps chromium firefox webkit
+          npx playwright install --with-deps
 
-      # ✅ Run Playwright shard with TestDino (STAGING)
+      # Run shard
       - name: Run Playwright shard with TestDino
         env:
           TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
@@ -62,15 +54,15 @@ jobs:
         run: |
           npx playwright test \
             --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} \
-            --grep "@chromium|@firefox|@webkit|@android|@ios|@api" \
+            --grep "@chromium|@firefox|@webkit|@android|@ios|@api"
 
-      # ✅ Upload blob report (needed for merge)
+      # Upload blob report
       - name: Upload blob report
-        if: ${{ !cancelled() }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: blob-report-${{ matrix.shardIndex }}
-          path: ./blob-report
+          path: blob-report
           retention-days: 1
 
   merge-reports:
@@ -83,34 +75,31 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
+          cache: 'npm'
 
-      # ✅ Install deps (TestDino not required here)
       - name: Install dependencies
         run: |
           npm ci
           npx playwright install --with-deps
 
-      # ✅ Download all shard blob reports
       - name: Download all blob reports
         uses: actions/download-artifact@v4
         with:
-          path: ./all-blob-reports
           pattern: blob-report-*
+          path: all-blob-reports
           merge-multiple: true
 
-      # ✅ Merge Playwright HTML report
       - name: Merge Playwright HTML report
         run: |
-          npx playwright merge-reports ./all-blob-reports
+          npx playwright merge-reports all-blob-reports
 
-      # ✅ Upload merged Playwright report
       - name: Upload combined Playwright report
         uses: actions/upload-artifact@v4
         with:
-          name: Playwright Test Report
-          path: ./playwright-report
+          name: playwright-report
+          path: playwright-report
           retention-days: 14
