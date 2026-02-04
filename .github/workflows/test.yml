@@ -31,4 +31,4 @@ jobs:
         env:
           TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
           TESTDINO_BASE_URL: ${{ secrets.TESTDINO_BASE_URL }}
-        run: npx tdpw upload
+        run: npx tdpw upload playwright-report
