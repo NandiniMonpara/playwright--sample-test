@@ -1,8 +1,6 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
-import * as dotenv from 'dotenv';
 
-dotenv.config({ quiet: true });
 const isCI = !!process.env.CI;
 
 export default defineConfig({
@@ -10,10 +8,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
-  workers: isCI ? 1 : 1,
-  
+  workers: isCI ? 5 : 5,
 
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   reporter: [
     ['html', {
       outputFolder: 'playwright-report',
@@ -21,12 +18,18 @@ export default defineConfig({
     }],
     ['blob', { outputDir: 'blob-report' }], // Blob reporter for merging
     ['json', { outputFile: './playwright-report/report.json' }],
+    ['list'],
+    ['@testdino/playwright', {
+      token: process.env.TESTDINO_TOKEN,
+      debug: true,
+      serverUrl: 'https://staging-api.testdino.com',
+    }],
   ],
 
   use: {
-    baseURL: 'https://demo.alphabin.co/',
+    baseURL: 'https://storedemo.testdino.com/',
     headless: true,
-    trace: 'on-first-retry',
+    trace: 'on',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
@@ -56,6 +59,11 @@ export default defineConfig({
       name: 'ios',
       use: { ...devices['iPhone 12'] },
       grep: /@ios/, // only run tests tagged @ios
+    },
+    {
+      name: 'api',
+      use: { ...devices['API'] },
+      grep: /@api/, // only run tests tagged @api
     },
   ],
 });
