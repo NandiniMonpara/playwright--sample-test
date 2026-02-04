@@ -27,6 +27,7 @@ jobs:
         run: npx playwright test
 
       - name: Upload results to TestDino
+        if: always()
         env:
           TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
           TESTDINO_BASE_URL: ${{ secrets.TESTDINO_BASE_URL }}
