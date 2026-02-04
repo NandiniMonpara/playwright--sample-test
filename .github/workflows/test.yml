@@ -26,9 +26,23 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
+      - name: Debug TestDino token
+        if: always()
+        env:
+          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
+        run: |
+          if [ -z "$TESTDINO_TOKEN" ]; then
+            echo "TESTDINO_TOKEN is NOT set"
+            exit 1
+          else
+            echo "TESTDINO_TOKEN is set"
+          fi
+
       - name: Upload results to TestDino
         if: always()
         env:
           TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
           TESTDINO_BASE_URL: ${{ secrets.TESTDINO_BASE_URL }}
-        run: npx tdpw upload playwright-report
+        run: |
+          echo "Uploading Playwright report to TestDino"
+          npx tdpw upload playwright-report --token "$TESTDINO_TOKEN"
