@@ -3,8 +3,6 @@ name: Run Playwright tests
 on:
   push:
   pull_request:
-  schedule:
-    - cron: '30 3 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -19,14 +17,16 @@ jobs:
         shardTotal: [5]
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
+      # ✅ Required Node version
       - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      # ✅ Required env variables for tests
       - name: Create .env file
         run: |
           echo "USERNAME=${{ secrets.USERNAME }}" >> .env
@@ -39,6 +39,7 @@ jobs:
           echo "COUNTRY=${{ secrets.COUNTRY }}" >> .env
           echo "ZIP_CODE=${{ secrets.ZIP_CODE }}" >> .env
 
+      # ✅ Cache npm dependencies
       - name: Cache npm dependencies
         uses: actions/cache@v3
         with:
@@ -47,23 +48,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install deps + browsers
+      # ✅ Install dependencies + TestDino (.tgz) + Playwright browsers
+      - name: Install dependencies & browsers
         run: |
           npm ci
           npx playwright install --with-deps chromium firefox webkit
 
-      - name: List Playwright projects (debug)
-        run: npx playwright list --projects | cat
-
-      - name: Run shard ${{ matrix.shardIndex }}
+      # ✅ Run Playwright shard with TestDino (STAGING)
+      - name: Run Playwright shard with TestDino
+        env:
+          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
+          TESTDINO_SERVER_URL: https://staging-api.testdino.com
         run: |
           npx playwright test \
-            --grep "@chromium|@firefox|@webkit|@android|@ios" \
-            --reporter=blob \
-            --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+            --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} \
+            --grep "@chromium|@firefox|@webkit|@android|@ios|@api" \
 
+      # ✅ Upload blob report (needed for merge)
       - name: Upload blob report
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: blob-report-${{ matrix.shardIndex }}
@@ -71,13 +74,13 @@ jobs:
           retention-days: 1
 
   merge-reports:
-    name: Merge Reports and upload to TestDino
+    name: Merge Reports
     needs: run-tests
     if: always()
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Node.js 20.x
@@ -85,19 +88,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install deps + browsers
+      # ✅ Install deps (TestDino not required here)
+      - name: Install dependencies
         run: |
           npm ci
           npx playwright install --with-deps
 
+      # ✅ Download all shard blob reports
       - name: Download all blob reports
         uses: actions/download-artifact@v4
         with:
@@ -105,25 +102,15 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
 
-      - name: Merge HTML & JSON reports
+      # ✅ Merge Playwright HTML report
+      - name: Merge Playwright HTML report
         run: |
-          npx playwright merge-reports --config=playwright.config.js ./all-blob-reports
+          npx playwright merge-reports ./all-blob-reports
 
-      - name: Upload combined report artifact
+      # ✅ Upload merged Playwright report
+      - name: Upload combined Playwright report
         uses: actions/upload-artifact@v4
         with:
           name: Playwright Test Report
           path: ./playwright-report
           retention-days: 14
-
-      - name: Send TestDino report
-        if: always()
-        env:
-          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
-          TESTDINO_BASE_URL: ${{ secrets.TESTDINO_BASE_URL }}
-        run: |
-          echo "Uploading merged Playwright report to TestDino (staging)"
-          npx --yes tdpw upload ./playwright-report \
-            --token "$TESTDINO_TOKEN" \
-            --environment staging \
-            --verbose
