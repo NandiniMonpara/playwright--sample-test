@@ -11,8 +11,8 @@ export default defineConfig({
   workers: isCI ? 5 : 5,
 
   timeout: 60 * 1000,
-  ['blob', { outputDir: 'blob-report' }], // Blob reporter for merging
   reporter: [
+    ['blob', { outputDir: 'blob-report' }], // Blob reporter for merging
     ['html', {
       outputFolder: 'playwright-report',
       open: 'never'
