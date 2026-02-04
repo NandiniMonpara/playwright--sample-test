@@ -11,12 +11,13 @@ export default defineConfig({
   workers: isCI ? 5 : 5,
 
   timeout: 60 * 1000,
+  ['blob', { outputDir: 'blob-report' }], // Blob reporter for merging
   reporter: [
     ['html', {
       outputFolder: 'playwright-report',
       open: 'never'
     }],
-    ['blob', { outputDir: 'blob-report' }], // Blob reporter for merging
+    
     ['json', { outputFile: './playwright-report/report.json' }],
     ['list'],
     ['@testdino/playwright', {
