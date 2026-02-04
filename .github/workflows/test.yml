@@ -44,5 +44,7 @@ jobs:
           TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
           TESTDINO_BASE_URL: ${{ secrets.TESTDINO_BASE_URL }}
         run: |
-          echo "Uploading Playwright report to TestDino"
-          npx tdpw upload playwright-report --token "$TESTDINO_TOKEN"
+          echo "Uploading Playwright report to TestDino (staging)"
+          npx tdpw upload playwright-report \
+            --token "$TESTDINO_TOKEN" \
+            --environment staging
