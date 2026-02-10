@@ -59,11 +59,12 @@ jobs:
       # ✅ Run Playwright shard with TestDino
       - name: Run Playwright shard with TestDino
         env:
-          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}        
+          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
+          TESTDINO_API_URL: ${{ secrets.TESTDINO_API_URL }}
         run: |
           npx playwright test \
             --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} \
-            --grep "@chromium|@firefox|@webkit|@android|@ios|@api" \
+            --grep "@chromium|@firefox|@webkit|@android|@ios|@api" 
 
       # ✅ Upload blob report (needed for merge)
       - name: Upload blob report
