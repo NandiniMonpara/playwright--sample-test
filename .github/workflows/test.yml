@@ -105,4 +105,3 @@ jobs:
           name: Playwright Test Report
           path: ./playwright-report
           retention-days: 14
-          
