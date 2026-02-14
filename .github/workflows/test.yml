@@ -53,7 +53,7 @@ jobs:
 
       - name: Run Playwright shard with TestDino
         env:
-          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
+          TESTDINO_TOKEN: trx_staging_705cae70defbb3ab45dde77d5f1c974908ab408ad33b2fcc2585e3d8aead23e7
           TESTDINO_SERVER_URL: https://staging-api.testdino.com
         run: |
           npx playwright test \
