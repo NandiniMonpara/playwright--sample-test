@@ -40,7 +40,6 @@ jobs:
 
       - name: Install deps + browsers
         run: |
-          npm ci
           npm install
           npx playwright install --with-deps
 
