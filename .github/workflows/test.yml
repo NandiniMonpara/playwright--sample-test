@@ -1,35 +1,43 @@
-# .github/workflows/test.yml
-# Runs Playwright tests on push, pull requests, and manual triggers
-
 name: Run Playwright tests
 
+
 on:
-  push:          # runs on every push
-  pull_request:  # runs on new PRs or PR updates
+  push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
   run-tests:
-    name: Run Playwright tests
+    name: Run shard ${{ matrix.shardIndex }}/5
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4, 5]
+        shardTotal: [5]
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Setup Node.js 20.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '20'
 
       - name: Create .env file
         run: |
           echo "USERNAME=${{ secrets.USERNAME }}" >> .env
-          echo "USERNAME1=${{ secrets.USERNAME1 }}" >> .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
           echo "NEW_PASSWORD=${{ secrets.NEW_PASSWORD }}" >> .env
           echo "FIRST_NAME=${{ secrets.FIRST_NAME }}" >> .env
-          
-     
+          echo "STREET_NAME=${{ secrets.STREET_NAME }}" >> .env
+          echo "CITY=${{ secrets.CITY }}" >> .env
+          echo "STATE=${{ secrets.STATE }}" >> .env
+          echo "COUNTRY=${{ secrets.COUNTRY }}" >> .env
+          echo "ZIP_CODE=${{ secrets.ZIP_CODE }}" >> .env
+
       - name: Cache npm dependencies
         uses: actions/cache@v3
         with:
@@ -38,25 +46,63 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install deps + browsers
+      - name: Install dependencies & browsers
         run: |
           npm install
+          npm install ./testdino-playwright-1.0.4.tgz
+          npx playwright install --with-deps chromium firefox webkit
+
+      - name: Run Playwright shard with TestDino
+        env:
+          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
+          TESTDINO_SERVER_URL: https://staging-api.testdino.com
+        run: |
+          npx playwright test \
+            --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      # ✅ Safe upload
+      - name: Upload blob report
+        if: ${{ !cancelled() && hashFiles('blob-report/**') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shardIndex }}
+          path: blob-report
+          retention-days: 1
+
+  merge-reports:
+    name: Merge Reports
+    needs: run-tests
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm ci
           npx playwright install --with-deps
 
-      - name: Run Playwright tests
-        run: npx playwright test 
+      - name: Download all blob reports
+        uses: actions/download-artifact@v4
+        with:
+          path: ./all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
 
-      # - name: Upload test report
-      #   if: ${{ !cancelled() }}
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Playwright Test Report
-      #     path: ./playwright-report
-      #     retention-days: 1
+      - name: Merge Playwright HTML report
+        run: |
+          npx playwright merge-reports ./all-blob-reports
 
-      # - name: Send TestDino report
-      #   run: |
-      #     npx --yes tdpw ./playwright-report \
-      #       --token=${{ secrets.TESTDINO_TOKEN }} \
-      #       --upload-html \
-      #       --verbose
+      - name: Upload combined Playwright report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Playwright Test Report
+          path: ./playwright-report
+          retention-days: 14
