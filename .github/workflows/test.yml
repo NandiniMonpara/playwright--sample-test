@@ -1,7 +1,5 @@
 name: Run Playwright tests
 
-
-
 on:
   push:
   pull_request:
