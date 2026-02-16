@@ -25,7 +25,7 @@ async function login(
 /* =================================================
    LEVEL 1 — ROOT SUITE
 ================================================= */
-test.describe.only('Application E2E Tests', () => {
+test.describe('Application E2E Tests', () => {
 
   /* =============================================
      LEVEL 2 — FEATURE
@@ -35,7 +35,7 @@ test.describe.only('Application E2E Tests', () => {
     /* =========================================
        LEVEL 3 — SCENARIO
     ========================================= */
-    test.describe('Delete Product from Cart', () => {
+    test.describe.only('Delete Product from Cart', () => {
 
       test('User can delete selected product from cart @ios', async () => {
         const productName = 'GoPro HERO10 Black';
