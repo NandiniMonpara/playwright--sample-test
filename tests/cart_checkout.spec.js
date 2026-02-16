@@ -25,7 +25,7 @@ async function login(
 /* =================================================
    LEVEL 1 — ROOT SUITE
 ================================================= */
-test.describe('Application E2E Tests', () => {
+test.describe.only('Application E2E Tests', () => {
 
   /* =============================================
      LEVEL 2 — FEATURE
