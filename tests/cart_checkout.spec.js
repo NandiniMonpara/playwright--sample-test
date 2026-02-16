@@ -30,12 +30,12 @@ test.describe('Application E2E Tests', () => {
   /* =============================================
      LEVEL 2 — FEATURE
   ============================================= */
-  test.describe('Cart Management', () => {
+  test.describe.only('Cart Management', () => {
 
     /* =========================================
        LEVEL 3 — SCENARIO
     ========================================= */
-    test.describe.only('Delete Product from Cart', () => {
+    test.describe('Delete Product from Cart', () => {
 
       test('User can delete selected product from cart @ios', async () => {
         const productName = 'GoPro HERO10 Black';
