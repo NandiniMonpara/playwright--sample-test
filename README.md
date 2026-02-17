@@ -1,5 +1,5 @@
 # Ecommerce demo store - Playwright (javascript) tests
-
+[![Test Health](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_697898a96c00daa9f30311ab.svg)](http://localhost:3001/org_695f847af29b01039f20bbf2/projects/project_697898a96c00daa9f30311ab)
 Automated end-to-end tests for Ecommerce demo store using [Playwright](https://playwright.dev/).
 
 ---
