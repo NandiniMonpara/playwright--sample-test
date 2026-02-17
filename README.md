@@ -1,6 +1,10 @@
 # Ecommerce demo store - Playwright (javascript) tests
 [![Test Health](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc)
 
+[![Flaky](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg?type=flaky)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc)
+[![Tests](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg?type=tests)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc)
+
+[![Test Health](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc) [![Flaky](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg?type=flaky)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc) [![Tests](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg?type=tests)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc)
 
 Automated end-to-end tests for Ecommerce demo store using [Playwright](https://playwright.dev/).
 
