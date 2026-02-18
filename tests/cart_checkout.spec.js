@@ -37,7 +37,7 @@ test.describe('Application E2E Tests', () => {
     ========================================= */
     test.describe('Delete Product from Cart', () => {
 
-      test.only('User can delete selected product from cart @ios', async () => {
+      test('User can delete selected product from cart @ios', async () => {
         const productName = 'GoPro HERO10 Black';
 
         await login();
