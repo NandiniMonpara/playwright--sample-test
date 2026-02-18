@@ -1,8 +1,5 @@
 # Ecommerce demo store - Playwright (javascript) tests
-[![Test Health](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc)
-
-[![Flaky](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg?type=flaky)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc)
-[![Tests](https://tanika-generic-jenna.ngrok-free.dev/api/badge/project_69903820073d29427e74d2dc.svg?type=tests)](http://localhost:3001/org_69903810073d29427e74d2aa/projects/project_69903820073d29427e74d2dc)
+[![Test Health](https://staging-api.testdino.com/api/badge/project_6992c173416d69136e571d19.svg)](https://staging.testdino.com/org_6982ebb019dedd5677632241/projects/project_6992c173416d69136e571d19) [![Flaky](https://staging-api.testdino.com/api/badge/project_6992c173416d69136e571d19.svg?type=flaky)](https://staging.testdino.com/org_6982ebb019dedd5677632241/projects/project_6992c173416d69136e571d19) [![Tests](https://staging-api.testdino.com/api/badge/project_6992c173416d69136e571d19.svg?type=tests)](https://staging.testdino.com/org_6982ebb019dedd5677632241/projects/project_6992c173416d69136e571d19)
 
 
 
