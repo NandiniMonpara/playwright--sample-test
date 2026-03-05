@@ -23,7 +23,7 @@ export default defineConfig({
     ['@testdino/playwright', {
       token: process.env.TESTDINO_TOKEN,
       debug: true,
-      serverUrl: 'https://tanika-generic-jenna.ngrok-free.dev',
+      serverUrl: 'https://api.testdino.com',
     }],
   ],
 
