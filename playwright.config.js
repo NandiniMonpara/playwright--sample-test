@@ -23,7 +23,7 @@ export default defineConfig({
     ['@testdino/playwright', {
       token: process.env.TESTDINO_TOKEN,
       debug: true,
-      serverUrl: 'https://api.testdino.com',
+      serverUrl: 'https://testdino-backend-uat.purplegrass-beecf167.eastus.azurecontainerapps.io',
     }],
   ],
 
