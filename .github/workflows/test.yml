@@ -1,108 +1,106 @@
-#       
-name: Run Playwright tests 
-
+name: Playwright Tests 
+       
 on:
   push:
   pull_request:
   workflow_dispatch:
 
-jobs:
-  run-tests:
-    name: Run shard ${{ matrix.shardIndex }}/5
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
+
+concurrency:
+  group: playwright-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4, 5]
-        shardTotal: [5]
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
+    env:
+      CI: true
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
+          cache: npm
 
-      - name: Create .env file
-        run: |
-          echo "USERNAME=${{ secrets.USERNAME }}" >> .env
-          echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
-          echo "NEW_PASSWORD=${{ secrets.NEW_PASSWORD }}" >> .env
-          echo "FIRST_NAME=${{ secrets.FIRST_NAME }}" >> .env
-          echo "STREET_NAME=${{ secrets.STREET_NAME }}" >> .env
-          echo "CITY=${{ secrets.CITY }}" >> .env
-          echo "STATE=${{ secrets.STATE }}" >> .env
-          echo "COUNTRY=${{ secrets.COUNTRY }}" >> .env
-          echo "ZIP_CODE=${{ secrets.ZIP_CODE }}" >> .env
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
-      - name: Install dependencies & browsers
-        run: |
-          npm install
-          npm install ./testdino-playwright-1.0.4.tgz
-          npx playwright install --with-deps chromium firefox webkit
+      - name: Run Playwright tests
+        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
-      - name: Run Playwright shard with TestDino
-        env:
-          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
-          TESTDINO_SERVER_URL: https://stg-api.testdino.com
-        run: |
-          npx playwright test \
-            --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
-
-      # ✅ Safe upload
       - name: Upload blob report
-        if: ${{ !cancelled() && hashFiles('blob-report/**') != '' }}
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: blob-report-${{ matrix.shardIndex }}
-          path: blob-report
+          path: blob-report/
           retention-days: 1
 
-  merge-reports:
-    name: Merge Reports
-    needs: run-tests
-    if: always()
+      - name: Upload Playwright test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.shardIndex }}
+          path: test-results/
+          retention-days: 14
+
+  merge-and-upload:
+    if: ${{ !cancelled() }}
+    needs: test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: true
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
+          cache: npm
 
       - name: Install dependencies
-        run: |
-          npm ci
-          npx playwright install --with-deps
+        run: npm ci
 
-      - name: Download all blob reports
+      - name: Download blob reports
         uses: actions/download-artifact@v4
         with:
-          path: ./all-blob-reports
+          path: all-blob-reports
           pattern: blob-report-*
           merge-multiple: true
 
-      - name: Merge Playwright HTML report
+      - name: Merge Playwright reports to JSON
         run: |
-          npx playwright merge-reports ./all-blob-reports
+          mkdir -p playwright-report
+          npx playwright merge-reports --reporter=json ./all-blob-reports > playwright-report/report.json
 
-      - name: Upload combined Playwright report
+      - name: Upload results to TestDino
+        env:
+          TESTDINO_API_URL: https://stg-api.testdino.com
+        run: node node_modules/tdpw/bin/tdpw.js upload ./playwright-report --token="${{ secrets.TESTDINO_TOKEN }}"
+
+      - name: Upload merged Playwright report
         uses: actions/upload-artifact@v4
         with:
-          name: Playwright Test Report
-          path: ./playwright-report
+          name: playwright-report
+          path: playwright-report/
           retention-days: 14

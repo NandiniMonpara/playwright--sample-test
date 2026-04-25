@@ -1,7 +1,9 @@
 {
   "name": "playwright-js-framework",
   "version": "1.0.0",
-  "scripts": {},
+  "scripts": {
+    "tdpw": "node node_modules/tdpw/bin/tdpw.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -11,8 +13,9 @@
     "@types/node": "^24.1.0"
   },
   "dependencies": {
+    "@testdino/playwright": "^1.0.7",
     "dotenv": "^17.2.1",
     "playwright": "^1.55.0",
-    "@testdino/playwright": "^1.0.10"
+    "tdpw": "^1.0.36"
   }
 }
