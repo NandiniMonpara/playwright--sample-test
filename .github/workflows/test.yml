@@ -54,8 +54,8 @@ jobs:
 
       - name: Run Playwright shard with TestDino
         env:
-          TESTDINO_TOKEN: trx_staging_1e8e558ca9e71215ab43a47eb767d08d3aac91bc46b4dd086e8d744f8a127dce
-          TESTDINO_SERVER_URL: https://staging-api.testdino.com
+          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
+          TESTDINO_SERVER_URL: https://stg-api.testdino.com
         run: |
           npx playwright test \
             --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
