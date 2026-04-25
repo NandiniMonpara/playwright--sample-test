@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
 
+
 concurrency:
   group: playwright-${{ github.ref }}
   cancel-in-progress: true
