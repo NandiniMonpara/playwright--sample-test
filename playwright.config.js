@@ -21,7 +21,7 @@ export default defineConfig({
     ['json', { outputFile: './playwright-report/report.json' }],
     ['list'],
     ['@testdino/playwright', {
-      token:  process.env.TESTDINO_TOKEN,
+      token: process.env.TESTDINO_TOKEN,
       debug: true,
       serverUrl: 'https://stg-api.testdino.com',
     }],
