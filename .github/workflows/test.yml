@@ -93,6 +93,8 @@ jobs:
           npx playwright merge-reports --reporter=json ./all-blob-reports > playwright-report/report.json
 
       - name: Upload results to TestDino
+        env:
+          TESTDINO_API_URL: https://stg-api.testdino.com
         run: node node_modules/tdpw/bin/tdpw.js upload ./playwright-report --token="${{ secrets.TESTDINO_TOKEN }}"
 
       - name: Upload merged Playwright report
