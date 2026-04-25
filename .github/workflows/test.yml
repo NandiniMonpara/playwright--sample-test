@@ -1,5 +1,5 @@
 #       
-name: Run Playwright tests
+name: Run Playwright tests 
 
 on:
   push:
