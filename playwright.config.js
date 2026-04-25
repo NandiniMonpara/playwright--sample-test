@@ -9,8 +9,8 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: isCI,
-  retries: isCI ? 1 : 0,
-  workers: isCI ? 1 : 1,
+  retries: isCI ? 0 : 0,
+  workers: isCI ? 3 : 3,
   
 
   timeout: 30 * 1000,
@@ -21,10 +21,23 @@ export default defineConfig({
     }],
     ['blob', { outputDir: 'blob-report' }], // Blob reporter for merging
     ['json', { outputFile: './playwright-report/report.json' }],
-  ],
+    
+   /*['@testdino/playwright', {
+      // token:'trx_production_2e3a3e3e9271a55990a27f1b0ebbd5fd6ef2a67acacbed09f8cf6116ff69754f',
+      // token:'trx_development_0d89aea81f7609c8dca85eebc56c6d05adcbe594fbe147e6c4be14e04fb06929',
+      token:'trx_staging_819111a7f7d873ecce896a507ae42ff0d96978083163aa42d8ccca1a4f766a3b',
+      //serverUrl: 'http://localhost:3001',
+      serverUrl: 'https://stg-api.testdino.com',
+       //serverUrl: 'https://api.testdino.com',
+      //serverUrl: 'https://testdino-backend-uat.purplegrass-beecf167.eastus.azurecontainerapps.io',
+      debug: true,
+       uploadArtifacts: false,
+      
+   }], */
+  ], 
 
   use: {
-    baseURL: 'https://demo.alphabin.co/',
+    baseURL: 'https://storedemo.testdino.com/',
     headless: true,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
