@@ -12,6 +12,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
+
 async function login(
   username = process.env.USERNAME,
   password = process.env.PASSWORD
